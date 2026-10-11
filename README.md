@@ -24,11 +24,12 @@ Luego visita `http://localhost:3000`.
 
 ## Controles
 
-| Tecla     | Acción     |
-| --------- | ---------- |
-| `←` `→`   | Rotar nave |
-| `↑`       | Propulsar  |
-| `Espacio` | Disparar   |
+| Tecla     | Acción                              |
+| --------- | ----------------------------------- |
+| `←` `→`   | Rotar nave                          |
+| `↑`       | Propulsar                           |
+| `Espacio` | Disparar                            |
+| `C`       | Cambiar de nave (clásica / morada)  |
 
 ## Puntuación
 
@@ -38,9 +39,19 @@ Luego visita `http://localhost:3000`.
 | Mediano   | 50     |
 | Pequeño   | 100    |
 
+Con la **nave morada** todos esos puntos se multiplican por 2.
+
+## Naves
+
+| Nave    | Tamaño  | Puntos |
+| ------- | ------- | ------ |
+| Clásica | normal  | x1     |
+| Morada  | x2      | x2     |
+
 ## Características
 
 - 3 vidas con invencibilidad temporal al reaparecer (parpadeo)
 - Asteroides se parten en fragmentos más pequeños al ser destruidos
 - Partículas de explosión al destruir asteroides
 - Power-up de **velocidad**: los asteroides destruidos pueden soltar un rayo que duplica el empuje de la nave durante 5 s (se pierde al perder una vida)
+- Dos naves intercambiables con `C`: la **clásica** y la **morada**, que es el doble de grande (blanco el doble de fácil de alcanzar) pero duplica todos los puntos conseguidos mientras la pilotas; se conservan posición, ángulo y velocidad al cambiar, pero no la invencibilidad

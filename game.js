@@ -119,8 +119,23 @@ class Asteroid {
 }
 
 // ── Ship ──────────────────────────────────────────────────────────────────────
+const SHIP_BASE_RADIUS = 12;
+const SHIP_NOSE        = 21;
+// La nave morada es el doble de grande, así que es el doble de fácil de alcanzar:
+// como compensación, todos los puntos que consigas con ella valen el doble.
+const SHIP_VARIANTS = {
+  classic: { color: '#fff',    scale: 1, points: 1 },
+  purple:  { color: '#a855f7', scale: 2, points: 2 },
+};
+
 class Ship {
-  constructor() { this.reset(); }
+  constructor(variant = 'classic') {
+    this.variant = variant;
+    this.reset();
+  }
+
+  get spec()       { return SHIP_VARIANTS[this.variant]; }
+  get pointsMult() { return this.spec.points; }
 
   reset() {
     this.x      = W / 2;
@@ -128,7 +143,7 @@ class Ship {
     this.angle  = -Math.PI / 2;
     this.vx     = 0;
     this.vy     = 0;
-    this.radius = 12;
+    this.radius = SHIP_BASE_RADIUS * this.spec.scale;
     this.thrusting     = false;
     this.invincible    = 3;
     this.shootCooldown = 0;
@@ -166,9 +181,9 @@ class Ship {
   tryShoot() {
     if (this.shootCooldown > 0 || this.dead) return [];
     this.shootCooldown = 0.2;
-    const NOSE = 21;
-    const ox = this.x + Math.cos(this.angle) * NOSE;
-    const oy = this.y + Math.sin(this.angle) * NOSE;
+    const nose = SHIP_NOSE * this.spec.scale;
+    const ox = this.x + Math.cos(this.angle) * nose;
+    const oy = this.y + Math.sin(this.angle) * nose;
     return [new Bullet(ox, oy, this.angle)];
   }
 
@@ -180,7 +195,8 @@ class Ship {
     ctx.save();
     ctx.translate(this.x, this.y);
     ctx.rotate(this.angle);
-    ctx.strokeStyle = '#fff';
+    ctx.scale(this.spec.scale, this.spec.scale);
+    ctx.strokeStyle = this.spec.color;
     ctx.lineWidth   = 1.5;
     ctx.lineJoin    = 'round';
 
@@ -330,6 +346,21 @@ function explode(x, y, count = 8) {
   for (let i = 0; i < count; i++) particles.push(new Particle(x, y));
 }
 
+// Cambio de nave: se conserva el estado de vuelo, pero no la invencibilidad,
+// para que no se pueda usar el cambio como escudo gratuito.
+function swapShip() {
+  const prev = ship;
+  ship = new Ship(prev.variant === 'purple' ? 'classic' : 'purple');
+  ship.x             = prev.x;
+  ship.y             = prev.y;
+  ship.angle         = prev.angle;
+  ship.vx            = prev.vx;
+  ship.vy            = prev.vy;
+  ship.shootCooldown = prev.shootCooldown;
+  ship.boost         = prev.boost;
+  ship.invincible    = prev.invincible;
+}
+
 function killShip() {
   explode(ship.x, ship.y, 14);
   ship.dead  = true;
@@ -367,6 +398,9 @@ function update(dt) {
     bullets.push(...ship.tryShoot());
   }
 
+  // Cambiar de nave (C)
+  if (pressed('KeyC')) swapShip();
+
   ship.update(dt);
   bullets.forEach(b => b.update(dt));
   asteroids.forEach(a => a.update(dt));
@@ -384,7 +418,7 @@ function update(dt) {
       if (!a.dead && !b.dead && dist(b, a) < a.radius) {
         b.dead = true;
         a.dead = true;
-        score += POINTS[a.size];
+        score += POINTS[a.size] * ship.pointsMult;
         explode(a.x, a.y, a.size * 5);
         if (Math.random() < POWERUP_CHANCE) powerups.push(new PowerUp(a.x, a.y));
         newAsteroids.push(...a.split());
@@ -452,6 +486,18 @@ function drawHUD() {
   if (ship && ship.boost > 0) {
     ctx.textAlign = 'left';
     ctx.fillText(`VEL x2  ${Math.ceil(ship.boost)}s`, 14, 46);
+  }
+
+  // Aviso de control disponible
+  ctx.textAlign = 'left';
+  ctx.fillStyle = 'rgba(255,255,255,0.45)';
+  ctx.fillText('C: CAMBIAR NAVE', 14, H - 16);
+
+  // Indicador de la nave morada (doble de tamaño, doble de puntos)
+  if (ship && ship.variant === 'purple') {
+    ctx.textAlign = 'right';
+    ctx.fillStyle = SHIP_VARIANTS.purple.color;
+    ctx.fillText('NAVE MORADA  PUNTOS x2', W - 14, H - 16);
   }
 }
 
