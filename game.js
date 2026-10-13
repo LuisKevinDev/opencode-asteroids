@@ -121,11 +121,13 @@ class Asteroid {
 // ── Ship ──────────────────────────────────────────────────────────────────────
 const SHIP_BASE_RADIUS = 12;
 const SHIP_NOSE        = 21;
-// La nave morada es el doble de grande, así que es el doble de fácil de alcanzar:
-// como compensación, todos los puntos que consigas con ella valen el doble.
+// El tamaño de la nave es una apuesta: más grande = más fácil de alcanzar, así que
+// da más puntos; más pequeña = más difícil de alcanzar, así que da menos puntos.
+const SHIP_ORDER = ['classic', 'purple', 'small'];   // orden del ciclo con C
 const SHIP_VARIANTS = {
-  classic: { color: '#fff',    scale: 1, points: 1 },
-  purple:  { color: '#a855f7', scale: 2, points: 2 },
+  classic: { label: 'CLÁSICA', color: '#fff',    scale: 1,   points: 1 },
+  purple:  { label: 'MORADA',  color: '#a855f7', scale: 2,   points: 2 },
+  small:   { label: 'LIGERA',  color: '#38bdf8', scale: 0.6, points: 0.5 },
 };
 
 class Ship {
@@ -350,7 +352,8 @@ function explode(x, y, count = 8) {
 // para que no se pueda usar el cambio como escudo gratuito.
 function swapShip() {
   const prev = ship;
-  ship = new Ship(prev.variant === 'purple' ? 'classic' : 'purple');
+  const next = SHIP_ORDER[(SHIP_ORDER.indexOf(prev.variant) + 1) % SHIP_ORDER.length];
+  ship = new Ship(next);
   ship.x             = prev.x;
   ship.y             = prev.y;
   ship.angle         = prev.angle;
@@ -418,7 +421,7 @@ function update(dt) {
       if (!a.dead && !b.dead && dist(b, a) < a.radius) {
         b.dead = true;
         a.dead = true;
-        score += POINTS[a.size] * ship.pointsMult;
+        score += Math.round(POINTS[a.size] * ship.pointsMult);
         explode(a.x, a.y, a.size * 5);
         if (Math.random() < POWERUP_CHANCE) powerups.push(new PowerUp(a.x, a.y));
         newAsteroids.push(...a.split());
@@ -493,11 +496,12 @@ function drawHUD() {
   ctx.fillStyle = 'rgba(255,255,255,0.45)';
   ctx.fillText('C: CAMBIAR NAVE', 14, H - 16);
 
-  // Indicador de la nave morada (doble de tamaño, doble de puntos)
-  if (ship && ship.variant === 'purple') {
+  // Indicador del tamaño de la nave elegida y su multiplicador de puntos
+  const spec = ship && ship.spec;
+  if (spec) {
     ctx.textAlign = 'right';
-    ctx.fillStyle = SHIP_VARIANTS.purple.color;
-    ctx.fillText('NAVE MORADA  PUNTOS x2', W - 14, H - 16);
+    ctx.fillStyle = spec.color;
+    ctx.fillText(`NAVE ${spec.label}  TAMAÑO x${spec.scale}  PUNTOS x${spec.points}`, W - 14, H - 16);
   }
 }
 
