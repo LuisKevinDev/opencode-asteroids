@@ -29,7 +29,7 @@ Luego visita `http://localhost:3000`.
 | `←` `→`   | Rotar nave                          |
 | `↑`       | Propulsar                           |
 | `Espacio` | Disparar                            |
-| `C`       | Cambiar de nave (clásica / morada)  |
+| `C`       | Cambiar tamaño de nave (clásica / morada / ligera) |
 
 ## Puntuación
 
@@ -39,14 +39,17 @@ Luego visita `http://localhost:3000`.
 | Mediano   | 50     |
 | Pequeño   | 100    |
 
-Con la **nave morada** todos esos puntos se multiplican por 2.
+Con la **nave morada** todos esos puntos se multiplican por 2, y con la **ligera** se reducen a la mitad.
 
 ## Naves
 
 | Nave    | Tamaño  | Puntos |
 | ------- | ------- | ------ |
-| Clásica | normal  | x1     |
+| Clásica | x1      | x1     |
 | Morada  | x2      | x2     |
+| Ligera  | x0.6    | x0.5   |
+
+Pulsa `C` para recorrer el ciclo clásica → morada → ligera.
 
 ## Características
 
@@ -54,4 +57,4 @@ Con la **nave morada** todos esos puntos se multiplican por 2.
 - Asteroides se parten en fragmentos más pequeños al ser destruidos
 - Partículas de explosión al destruir asteroides
 - Power-up de **velocidad**: los asteroides destruidos pueden soltar un rayo que duplica el empuje de la nave durante 5 s (se pierde al perder una vida)
-- Dos naves intercambiables con `C`: la **clásica** y la **morada**, que es el doble de grande (blanco el doble de fácil de alcanzar) pero duplica todos los puntos conseguidos mientras la pilotas; se conservan posición, ángulo y velocidad al cambiar, pero no la invencibilidad
+- Tres tamaños de nave intercambiables con `C`: la **clásica** (x1), la **morada**, que es el doble de grande (blanco el doble de fácil de alcanzar) y duplica todos los puntos conseguidos mientras la pilotas, y la **ligera**, de la mitad de tamaño (blanco difícil) pero que reduce los puntos a la mitad; se conservan posición, ángulo y velocidad al cambiar, pero no la invencibilidad
